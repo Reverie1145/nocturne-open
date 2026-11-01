@@ -1,0 +1,46 @@
+package com.viaversion.viafabricplus.injection.mixin.core.integration;
+
+import com.viaversion.viafabricplus.features.global.VFPDebugHudEntry;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.gui.components.debug.DebugScreenProfile;
+import net.minecraft.resources.Identifier;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(DebugScreenEntries.class)
+public abstract class MixinDebugScreenEntries {
+
+    @Mutable
+    @Shadow
+    @Final
+    public static Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> PROFILES;
+
+    @Shadow
+    private static Identifier register(final Identifier id, final DebugScreenEntry entry) {
+        return null;
+    }
+
+    @Inject(method = "<clinit>", at = @At("RETURN"))
+    private static void addViaFabricPlusEntry(CallbackInfo ci) {
+        final Identifier id = register(VFPDebugHudEntry.ID, new VFPDebugHudEntry());
+        final Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> profiles = new HashMap<>();
+        for (Map.Entry<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
+            final Map<Identifier, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
+            if (entry.getKey() == DebugScreenProfile.DEFAULT) {
+                entries.put(id, DebugScreenEntryStatus.IN_OVERLAY);
+            }
+            profiles.put(entry.getKey(), entries);
+        }
+        PROFILES = profiles;
+    }
+
+}

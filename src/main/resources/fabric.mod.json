@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "nocturne",
+  "version": "${version}",
+  "name": "Nocturne",
+  "description": "A Minecraft Client By Reverie",
+  "authors": [
+    "Reverie"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/nocturne/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "cn.reverie.client.nocturneClient"
+    ],
+    "main": [
+      "cn.reverie.client.nocturne"
+    ],
+    "modmenu": [
+      "com.viaversion.viafabricplus.util.ModMenuScreenFactory"
+    ],
+    "viafabricplus": [
+      "com.viaversion.viafabricplus.ViaFabricPlusImpl"
+    ]
+  },
+  "mixins": [
+    "nocturne.mixins.json",
+    "viafabricplus.mixins.json"
+  ],
+  "accessWidener": "viafabricplus.accesswidener",
+  "provides": [
+    "viaversion",
+    "viabackwards"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}

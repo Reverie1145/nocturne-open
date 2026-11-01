@@ -1,0 +1,49 @@
+{
+  "seed": 57320481,
+  "packages": [
+    "cn/reverie"
+  ],
+  "exclude": [],
+  "deepPackages": [
+    "cn/reverie/nocturne",
+    "cn/reverie/app"
+  ],
+  "keepClasses": [
+    "cn/reverie/nocturne/NBootstrap",
+    "cn/reverie/nocturne/PackBoot",
+    "cn/reverie/nocturne/DecryptingClassLoader",
+    "cn/reverie/nocturne/NRes",
+    "cn/reverie/client/nocturneClient",
+    "cn/reverie/client/nocturne"
+  ],
+  "keepPackages": [
+    "cn/reverie/mixin"
+  ],
+  "softPackages": [],
+  "keepMembers": [
+    "cn/reverie/nocturne/NativeGuard",
+    "cn/reverie/nocturne/StringVault"
+  ],
+  "nameStyle": "glyph",
+  "stringPools": 5,
+  "numbers": true,
+  "flow": true,
+  "flowMaxInsns": 24000,
+  "refs": true,
+  "traps": true,
+  "pack": true,
+  "integrity": {
+    "enabled": true,
+    "hookClass": "cn/reverie/client/nocturneClient",
+    "hookMethod": "onInitializeClient()V",
+    "sample": 24
+  },
+  "native": {
+    "bundle": true,
+    "resCore": "assets/nocturne/n0.dat",
+    "resLoader": "assets/nocturne/n1.dat",
+    "bundleKey": "nocturne-nc-bundle-v1",
+    "appId": "nc-1"
+  },
+  "verify": true
+}

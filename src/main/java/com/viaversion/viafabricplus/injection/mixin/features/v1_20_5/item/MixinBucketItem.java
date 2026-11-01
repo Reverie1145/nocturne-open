@@ -1,0 +1,25 @@
+package com.viaversion.viafabricplus.injection.mixin.features.v1_20_5.item;
+
+import com.viaversion.viafabricplus.ViaFabricPlus;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+@Mixin(BucketItem.class)
+public abstract class MixinBucketItem {
+
+    @Redirect(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemUtils;createFilledResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;", ordinal = 1))
+    private ItemStack dontExchangeStack(ItemStack itemStack, Player player, ItemStack newItemStack) {
+        if (ViaFabricPlus.api().targetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_5)) {
+            return newItemStack;
+        } else {
+            return ItemUtils.createFilledResult(itemStack, player, newItemStack);
+        }
+    }
+
+}

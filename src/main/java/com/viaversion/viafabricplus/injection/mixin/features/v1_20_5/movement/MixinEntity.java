@@ -1,0 +1,65 @@
+package com.viaversion.viafabricplus.injection.mixin.features.v1_20_5.movement;
+
+import com.viaversion.viafabricplus.ViaFabricPlus;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import java.util.List;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(Entity.class)
+public abstract class MixinEntity {
+
+    @Shadow
+    private Level level;
+
+    @Shadow
+    public abstract AABB getBoundingBox();
+
+    @Shadow
+    public abstract boolean onGround();
+
+    @Shadow
+    public abstract float maxUpStep();
+
+    @Shadow
+    public abstract Level level();
+
+    @Inject(method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;", at = @At("HEAD"), cancellable = true)
+    private void use1_20_6StepCollisionCalculation(Vec3 movement, CallbackInfoReturnable<Vec3> cir) {
+        if (ViaFabricPlus.api().targetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_5)) {
+            final Entity thiz = (Entity) (Object) this;
+            final AABB box = this.getBoundingBox();
+            final List<VoxelShape> collisions = this.level().getEntityCollisions(thiz, box.expandTowards(movement));
+            Vec3 adjustedMovement = movement.lengthSqr() == 0D ? movement : Entity.collideBoundingBox(thiz, movement, box, this.level(), collisions);
+            final boolean changedX = movement.x != adjustedMovement.x;
+            final boolean changedY = movement.y != adjustedMovement.y;
+            final boolean changedZ = movement.z != adjustedMovement.z;
+            final boolean mayTouchGround = this.onGround() || changedY && movement.y < 0D;
+            if (this.maxUpStep() > 0F && mayTouchGround && (changedX || changedZ)) {
+                Vec3 vec3d2 = Entity.collideBoundingBox(thiz, new Vec3(movement.x, this.maxUpStep(), movement.z), box, this.level(), collisions);
+                Vec3 vec3d3 = Entity.collideBoundingBox(thiz, new Vec3(0D, this.maxUpStep(), 0D), box.expandTowards(movement.x, 0D, movement.z), this.level(), collisions);
+                if (vec3d3.y < this.maxUpStep()) {
+                    Vec3 vec3d4 = Entity.collideBoundingBox(thiz, new Vec3(movement.x, 0D, movement.z), box.move(vec3d3), this.level(), collisions).add(vec3d3);
+                    if (vec3d4.horizontalDistanceSqr() > vec3d2.horizontalDistanceSqr()) {
+                        vec3d2 = vec3d4;
+                    }
+                }
+
+                if (vec3d2.horizontalDistanceSqr() > adjustedMovement.horizontalDistanceSqr()) {
+                    adjustedMovement = vec3d2.add(Entity.collideBoundingBox(thiz, new Vec3(0D, -vec3d2.y + (ViaFabricPlus.api().targetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2) ? 0 : movement.y), 0D), box.move(vec3d2), this.level(), collisions));
+                }
+            }
+
+            cir.setReturnValue(adjustedMovement);
+        }
+    }
+
+}

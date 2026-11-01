@@ -51,7 +51,7 @@ gradlew protectedBuild
 
 ---
 
-## 保护管线（本仓库的核心之一）
+## 保护管线（并不强）
 
 发布版不是把 class 直接塞进 jar，而是经过一条四段式流水线。所有密钥都只在 native 镜像里推导，
 jar 里拿不到任何可解密的材料。
@@ -137,18 +137,6 @@ src/main/java/           mixin 与少量 Java 工具
 src/main/kotlin/         主体（client / manager / module / render / gui / app）
 src/main/resources/      资源（字体、着色器、视频、图标）
 ```
-
----
-
-## 与上游的差异
-
-为开源发布，以下内容已从本仓库移除：
-
-- **IRC 网络层**：`IrcManager` / `IrcShareManager` 的 socket、TLS 固定、AUTH 握手、图片上传全部删除，
-  只保留与原 API 同形的空实现，点击 GUI 的聊天面板仍在（显示离线态）。
-- **分发上传链路**：`uploadRelease` / `obfuscateAndUpload` 任务与上传脚本（含分发服务器地址与凭据处理）已删除。
-- 账号后端地址与 app secret 不随仓库分发；自建后端请改 `NocturneAuth.API_BASE`。
-
 ---
 
 ## 协议
